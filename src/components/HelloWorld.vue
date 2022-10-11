@@ -1,58 +1,87 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <v-container fluid>
+    <v-row align="center">
+        <v-col
+        class="d-flex"
+        cols="12"
+        sm="6"
+        center
+      >
+        <v-select
+          :items="items"
+          label="Select minutes"
+          v-model="select"
+          solo
+        ></v-select>
+      </v-col>
+    </v-row>
+    <div>
+      <v-text-field
+        :rules="rules"
+        style="width: 50%"
+        v-if="showInputBox"
+        v-model="select"
+      ></v-text-field>
+    </div>
+    <v-btn
+      elevation="2"
+      right
+      @click="startTimer"
+    >Press</v-btn>
+  <div v-if="showTimer">
+    <div> {{this.minutes}} : <p v-if="this.seconds < 10">0{{this.seconds}}</p>
+    <p v-else>{{this.seconds}}</p></div>
   </div>
+  </v-container>
 </template>
-
 <script>
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
+  data: () => ({
+    select: '',
+    items: [20, 30, 40, 50, 'choose number'],
+    rules: [
+      value => !!value || 'Required.',
+      value => (value && !(isNaN(value))) || 'Enter digit',
+    ],
+    seconds: 0,
+    minutes: 0,
+    showInput: false,
+    showTimer: false
+  }),
+  computed:{
+    showInputBox(){
+      if(this.select === 'choose number'){
+        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+        this.showInput = true
+      }
+      return this.showInput
+    },
+
+  },
+  methods:{
+    startTimer(){
+      this.showTimer = true
+      this.minutes = this.select-1
+      this.seconds = 59
+
+      if(this.minute !== 0 && this.seconds > 0){
+        setInterval(this.funcToTimer,1000)
+
+      }
+    },
+    funcToTimer(){
+      if(this.minutes > 0 && this.seconds === 0){
+        this.minutes --
+        this.seconds = 59
+      }
+     else if(this.seconds > 0) {
+        this.seconds--
+      }
+     else {
+        this.minutes = 0
+        this.seconds = 0
+      }
+    }
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
